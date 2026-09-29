@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "claudeye": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "--no-sync", "claudeye"],
+      "env": {
+        "CLAUDEYE_MAX_EDGE": "1568",
+        "CLAUDEYE_ALLOW_CLOUD": "0"
+      }
+    }
+  }
+}

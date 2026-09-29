@@ -1,0 +1,87 @@
+[project]
+name = "claudeye"
+version = "0.1.0"
+description = "Vision middleware (MCP server) that gives Claude Code precise eyes for images and videos"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "praysw", email = "praysw@cinamon.co.kr" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "av>=18.1.0",
+    "mcp[cli]>=2.2.0",
+    "numpy>=2.5.3",
+    "opencv-python-headless>=5.0.0.93",
+    "pillow>=12.3.0",
+]
+
+[project.scripts]
+claudeye = "claudeye:main"
+
+# Pick extras per machine:
+#   laptop / no NVIDIA GPU : uv sync --extra ocr --extra asr --extra ml --extra cpu
+#   RTX 4070 (driver>=580) : uv sync --extra ocr --extra asr --extra asr-cuda --extra ml --extra cu130
+#   RTX, driver 525-579    : same with --extra cu126 instead of cu130
+[project.optional-dependencies]
+ocr = [
+    "onnxruntime>=1.30.0",
+    "rapidocr>=3.9.2",
+]
+asr = [
+    "faster-whisper>=1.2.1",
+]
+# CUDA 12 runtime DLLs for CTranslate2 (faster-whisper) on Windows
+asr-cuda = [
+    "nvidia-cublas-cu12",
+    "nvidia-cudnn-cu12>=9,<10",
+    "nvidia-cuda-runtime-cu12",
+]
+ml = [
+    "transformers>=5.0",
+    "accelerate>=1.0",
+    "safetensors",
+]
+cpu = ["torch>=2.8", "torchvision>=0.23"]
+cu130 = ["torch>=2.9", "torchvision>=0.24"]
+cu126 = ["torch>=2.8", "torchvision>=0.23"]
+gemini = ["google-genai>=2.0"]
+
+[tool.uv]
+conflicts = [[{ extra = "cpu" }, { extra = "cu130" }, { extra = "cu126" }]]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu130", extra = "cu130" },
+    { index = "pytorch-cu126", extra = "cu126" },
+]
+torchvision = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu130", extra = "cu130" },
+    { index = "pytorch-cu126", extra = "cu126" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[build-system]
+requires = ["uv_build>=0.9.15,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
